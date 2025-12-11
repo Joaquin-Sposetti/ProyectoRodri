@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --radius: 16px;
+}
+
+/* Para que el body ocupe todo */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/* Helpers tipo Docta */
+.section {
+  @apply py-20 md:py-28;
+}
+
+.container {
+  @apply max-w-7xl mx-auto px-4;
+}
+
+/* Botones */
+.btn {
+  @apply inline-flex items-center gap-2 rounded-2xl px-5 py-3 font-semibold shadow-soft transition-transform hover:-translate-y-0.5 active:translate-y-0;
+}
+
+.btn-primary {
+  @apply bg-easyliftBlue text-white hover:bg-easyliftBlueSoft;
+}
+
+.btn-outline {
+  @apply border border-easyliftAccent/40 text-easyliftBlue hover:bg-easyliftAccent/10;
+}
+
+/* Cards */
+.card {
+  @apply bg-white/90 backdrop-blur rounded-3xl p-6 border border-slate-200 shadow-soft;
+}
+
+/* Slideshow (por si después querés fotos de equipos) */
+.slideshow {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.slideshow .slide:first-child {
+  opacity: 1 !important;
+}
+
+.slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  animation: fadeSlide 36s infinite;
+}
+
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slide:nth-child(1) { animation-delay: 0s; }
+.slide:nth-child(2) { animation-delay: 6s; }
+.slide:nth-child(3) { animation-delay: 12s; }
+.slide:nth-child(4) { animation-delay: 18s; }
+.slide:nth-child(5) { animation-delay: 24s; }
+.slide:nth-child(6) { animation-delay: 30s; }
+
+@keyframes fadeSlide {
+  10% { opacity: 0; transform: scale(1.05); }
+  20% { opacity: 1; transform: scale(1.02); }
+  25% { opacity: 1; transform: scale(1); }
+  33% { opacity: 0; transform: scale(1.05); }
+  100% { opacity: 0; }
+}
+
+/* Animación suave (por si querés usarla) */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 1.2s ease-out forwards;
+}
