@@ -40,6 +40,7 @@ body,
   @apply bg-white/90 backdrop-blur rounded-3xl p-6 border border-slate-200 shadow-soft;
 }
 
+
 /* Slideshow (por si después querés fotos de equipos) */
 .slideshow {
   position: relative;

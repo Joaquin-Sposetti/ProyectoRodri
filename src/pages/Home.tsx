@@ -39,6 +39,19 @@ export default function Home() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+      const element = document.getElementById(id);
+      if (element) {
+        // Le damos un mini respiro de 100ms para que cargue el DOM
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      }
+    }
+  }, [location]);
+
   // bloquear scroll cuando el menú está abierto
   useEffect(() => {
     if (open) document.body.style.overflow = "hidden";
@@ -47,6 +60,17 @@ export default function Home() {
       document.body.style.overflow = "";
     };
   }, [open]);
+
+  // helper seguro para navegar y arrancar arriba
+  const goCatalogTop = (url: string) => {
+    navigate(url);
+    setTimeout(() => {
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      }
+    }, 0);
+  };
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-[#edf2ff] text-slate-900">
@@ -77,9 +101,10 @@ export default function Home() {
                 {n.label}
               </a>
             ))}
-            {/* Link extra al catálogo */}
+
+            {/* Link extra al catálogo (igual que los otros + animación) */}
             <button
-              onClick={() => navigate("/productos")}
+              onClick={() => goCatalogTop("/productos")}
               className="text-[15px] font-medium text-slate-600 hover:text-easyliftBlue transition-colors"
               type="button"
             >
@@ -200,9 +225,9 @@ export default function Home() {
                 <button
                   onClick={() => {
                     setOpen(false);
-                    navigate("/productos");
+                    goCatalogTop("/productos");
                   }}
-                  className="mt-2 rounded-lg px-4 py-3 text-base font-semibold text-easyliftBlue hover:bg-slate-100 transition-colors text-left"
+                  className="mt-2 rounded-lg px-4 py-3 text-base font-medium text-slate-700 hover:text-easyliftBlue hover:bg-slate-100 transition-colors text-left"
                   type="button"
                 >
                   Ver catálogo →
@@ -276,7 +301,7 @@ export default function Home() {
               </a>
               <button
                 type="button"
-                onClick={() => navigate("/productos")}
+                onClick={() => goCatalogTop("/productos")}
                 className="btn btn-outline"
               >
                 Ver catálogo
@@ -335,7 +360,7 @@ export default function Home() {
                 key={c.title}
                 {...fadeIn}
                 type="button"
-                onClick={() => navigate(`/productos?cat=${c.slug}`)}
+                onClick={() => goCatalogTop(`/productos?cat=${c.slug}`)}
                 className="rounded-2xl bg-[#f6f7ff] shadow-md ring-1 ring-slate-200 p-6 transition-all hover:shadow-lg text-center"
               >
                 <div className="flex items-center justify-center mb-3">
@@ -516,7 +541,12 @@ export default function Home() {
               falta, coordinamos una visita.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <a href={WHATSAPP} target="_blank" rel="noreferrer" className="btn btn-outline">
+              <a
+                href={WHATSAPP}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-outline"
+              >
                 <MessageCircle size={18} />
                 WhatsApp
               </a>
@@ -557,10 +587,7 @@ export default function Home() {
                 placeholder="Depósito, tipo de carga, horas de uso, etc."
                 required
               />
-              <button
-                type="submit"
-                className="btn btn-primary w-full justify-center"
-              >
+              <button type="submit" className="btn btn-primary w-full justify-center">
                 Enviar consulta
               </button>
             </form>
@@ -574,8 +601,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <img src="/easylift-logo.png" className="h-8" alt="Easylift" />
             <span>
-              © {new Date().getFullYear()} Easylift. Todos los derechos
-              reservados.
+              © {new Date().getFullYear()} Easylift. Todos los derechos reservados.
             </span>
           </div>
           <div className="flex items-center gap-4">
@@ -584,7 +610,7 @@ export default function Home() {
             </a>
             <button
               type="button"
-              onClick={() => navigate("/productos")}
+              onClick={() => goCatalogTop("/productos")}
               className="hover:text-easyliftBlue"
             >
               Catálogo

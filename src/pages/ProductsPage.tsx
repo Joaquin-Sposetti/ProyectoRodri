@@ -1,7 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Search, X, Menu, Phone, Instagram, Facebook, Linkedin } from "lucide-react";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+
+import {
+  ArrowLeft,
+  Search,
+  X,
+  Menu,
+  Phone,
+  Instagram,
+  Facebook,
+  Linkedin,
+} from "lucide-react";
 import { CATEGORY_LABEL, PRODUCTS, type ProductCategory } from "../data/products";
 
 const WHATSAPP = "https://wa.me/5490000000000"; // poné el número real
@@ -27,6 +37,7 @@ const categories: ProductCategory[] = [
 export default function ProductsPage() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation(); // ✅ IMPORTANTE
 
   const [params, setParams] = useSearchParams();
   const cat = (params.get("cat") as ProductCategory | null) ?? null;
@@ -79,96 +90,135 @@ export default function ProductsPage() {
     setParams({});
   }
 
+  // ✅ Navegación correcta de la navbar (Home <-> Catálogo)
+const goToSection = (id: string) => {
+    setOpen(false); // Cerramos el menú mobile siempre
+    
+    if (location.pathname === "/") {
+      // Si ya estamos en el inicio, scrollea directo
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      // Si estamos en /productos, vamos a la home con el "hash" (#)
+      navigate(`/#${id}`);
+    }
+  };
+
+  const goHomeTop = () => {
+    navigate("/");
+    setOpen(false);
+    setTimeout(() => {
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      }
+    }, 0);
+  };
+
+  const goCatalogTop = () => {
+    // ya estás en /productos, solo subir arriba
+    setOpen(false);
+    setTimeout(() => {
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      }
+    }, 0);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-[#edf2ff] text-slate-900">
-      {/* NAVBAR (MISMA QUE HOME, solo ajustamos href a /#... ) */}
+      {/* NAVBAR (MISMA ESTÉTICA QUE HOME) */}
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-lg shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-  <div className="max-w-7xl mx-auto flex h-20 items-center justify-between px-4">
-    {/* Logo */}
-    <button
-      onClick={() => navigate("/")}
-      className="flex items-center hover:scale-[1.03] transition-transform"
-    >
-      <img
-        src="/easylift-logo.png"
-        alt="Easylift"
-        className="h-14 sm:h-16 md:h-20 w-auto object-contain"
-        style={{ minWidth: "150px" }}
-      />
-    </button>
+        <div className="max-w-7xl mx-auto flex h-20 items-center justify-between px-4">
+          {/* Logo */}
+          <button
+            onClick={goHomeTop}
+            className="flex items-center hover:scale-[1.03] transition-transform"
+            type="button"
+          >
+            <img
+              src="/easylift-logo.png"
+              alt="Easylift"
+              className="h-14 sm:h-16 md:h-20 w-auto object-contain"
+              style={{ minWidth: "150px" }}
+            />
+          </button>
 
-    {/* Links desktop */}
-    <nav className="hidden md:flex items-center gap-10 ml-10">
-      {nav.map((n) => (
-        <button
-          key={n.id}
-          type="button"
-          onClick={() => {
-            // 👉 Si estamos en Home, scrollea
-            if (location.pathname === "/") {
-              const el = document.getElementById(n.id);
-              if (el) {
-                el.scrollIntoView({ behavior: "smooth", block: "start" });
-              }
-            } else {
-              // 👉 Si estamos en /productos u otra página, vuelve a Home + anchor
-              navigate(`/#${n.id}`);
-            }
-          }}
-          className="text-[15px] font-medium text-slate-600 hover:text-easyliftBlue transition-colors"
-        >
-          {n.label}
-        </button>
-      ))}
+          {/* Links desktop */}
+          <nav className="hidden md:flex items-center gap-10 ml-10">
+            {nav.map((n) => (
+              <button
+                key={n.id}
+                type="button"
+                onClick={() => goToSection(n.id)}
+                className="text-[15px] font-medium text-slate-600 hover:text-easyliftBlue transition-colors"
+              >
+                {n.label}
+              </button>
+            ))}
 
-      {/* Catálogo */}
-      <button
-        onClick={() => {
-          if (location.pathname === "/productos") {
-            const el = document.getElementById("catalogo");
-            if (el) el.scrollIntoView({ behavior: "smooth" });
-          } else {
-            navigate("/productos");
-          }
-        }}
-        className="text-[15px] font-medium text-slate-600 hover:text-easyliftBlue transition-colors"
-        type="button"
-      >
-        Catálogo
-      </button>
-    </nav>
+            {/* Catálogo (en catálogo solo sube arriba) */}
+            <button
+              onClick={goCatalogTop}
+              className="text-[15px] font-medium text-slate-600 hover:text-easyliftBlue transition-colors"
+              type="button"
+            >
+              Catálogo
+            </button>
+          </nav>
 
-    {/* Redes + botones desktop */}
-    <div className="hidden md:flex items-center gap-6 ml-8 pl-8 border-l border-slate-200">
-      <div className="flex items-center gap-3">
-        <Instagram size={20} className="text-slate-500 hover:text-easyliftBlue" />
-        <Facebook size={20} className="text-slate-500 hover:text-easyliftBlue" />
-        <Linkedin size={20} className="text-slate-500 hover:text-easyliftBlue" />
-      </div>
+          {/* Redes + botones desktop */}
+          <div className="hidden md:flex items-center gap-6 ml-8 pl-8 border-l border-slate-200">
+            <div className="flex items-center gap-3">
+              <a
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noreferrer"
+                className="text-slate-500 hover:text-easyliftBlue transition"
+              >
+                <Instagram size={20} />
+              </a>
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noreferrer"
+                className="text-slate-500 hover:text-easyliftBlue transition"
+              >
+                <Facebook size={20} />
+              </a>
+              <a
+                href="https://linkedin.com"
+                target="_blank"
+                rel="noreferrer"
+                className="text-slate-500 hover:text-easyliftBlue transition"
+              >
+                <Linkedin size={20} />
+              </a>
+            </div>
 
-      <a
-        href={WHATSAPP}
-        target="_blank"
-        rel="noreferrer"
-        className="flex items-center justify-center gap-2 border border-easyliftBlue text-easyliftBlue px-5 py-2.5 rounded-lg hover:bg-easyliftBlue hover:text-white transition shadow-sm font-medium"
-      >
-        <Phone size={18} />
-        Llamar
-      </a>
-    </div>
+            <a
+              href={WHATSAPP}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-center gap-2 border border-easyliftBlue text-easyliftBlue px-5 py-2.5 rounded-lg hover:bg-easyliftBlue hover:text-white transition shadow-sm font-medium"
+            >
+              <Phone size={18} />
+              Llamar
+            </a>
+          </div>
 
-    {/* Botón menú mobile */}
-    <button
-      className="md:hidden rounded-xl p-2 hover:bg-slate-100"
-      onClick={() => setOpen(true)}
-      aria-label="Abrir menú"
-    >
-      <Menu />
-    </button>
-  </div>
-</header>
+          {/* Botón menú mobile */}
+          <button
+            className="md:hidden rounded-xl p-2 hover:bg-slate-100"
+            onClick={() => setOpen(true)}
+            aria-label="Abrir menú"
+            type="button"
+          >
+            <Menu />
+          </button>
+        </div>
+      </header>
 
-      {/* MENÚ MOBILE CON FONDO DIFUMINADO (solo fondo, menú no) */}
+      {/* MENÚ MOBILE CON FONDO DIFUMINADO */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -199,6 +249,7 @@ export default function ProductsPage() {
                   className="rounded-xl p-2 hover:bg-slate-100"
                   onClick={() => setOpen(false)}
                   aria-label="Cerrar menú"
+                  type="button"
                 >
                   <X />
                 </button>
@@ -206,22 +257,19 @@ export default function ProductsPage() {
 
               <nav className="mt-6 flex flex-col gap-2 border-t border-slate-200 pt-6">
                 {nav.map((n) => (
-                  <a
+                  <button
                     key={n.id}
-                    href={`/#${n.id}`}
-                    onClick={() => setOpen(false)}
-                    className="rounded-lg px-4 py-3 text-base font-medium hover:bg-slate-100 transition-colors"
+                    type="button"
+                    onClick={() => goToSection(n.id)}
+                    className="rounded-lg px-4 py-3 text-base font-medium hover:bg-slate-100 transition-colors text-left"
                   >
                     {n.label}
-                  </a>
+                  </button>
                 ))}
 
                 <button
-                  onClick={() => {
-                    setOpen(false);
-                    navigate("/productos");
-                  }}
-                  className="mt-2 rounded-lg px-4 py-3 text-base font-semibold text-easyliftBlue hover:bg-slate-100 transition-colors text-left"
+                  onClick={goCatalogTop}
+                  className="mt-2 rounded-lg px-4 py-3 text-base font-medium text-slate-700 hover:text-easyliftBlue hover:bg-slate-100 transition-colors text-left"
                   type="button"
                 >
                   Ver catálogo →
@@ -238,13 +286,14 @@ export default function ProductsPage() {
                   <Phone size={16} />
                   WhatsApp
                 </a>
-                <a
-                  href="/#contacto"
-                  onClick={() => setOpen(false)}
+
+                <button
+                  type="button"
+                  onClick={() => goToSection("contacto")}
                   className="flex items-center justify-center gap-2 bg-easyliftBlue text-white font-semibold py-2 rounded-xl hover:bg-easyliftBlueSoft transition text-sm"
                 >
                   Pedir presupuesto
-                </a>
+                </button>
               </div>
             </motion.div>
           </motion.div>
@@ -256,7 +305,7 @@ export default function ProductsPage() {
         {/* Top bar */}
         <div className="flex items-center justify-between gap-4">
           <button
-            onClick={() => navigate("/")}
+            onClick={goHomeTop}
             className="inline-flex items-center gap-2 text-sm font-semibold text-easyliftBlue hover:underline"
             type="button"
           >
@@ -280,7 +329,8 @@ export default function ProductsPage() {
           Catálogo
         </h1>
         <p className="mt-2 text-sm sm:text-base text-slate-600 max-w-2xl">
-          Buscá por nombre o descripción y filtrá por categoría. Podés limpiar filtros para ver todo.
+          Buscá por nombre o descripción y filtrá por categoría. Podés limpiar
+          filtros para ver todo.
         </p>
 
         {/* Search + Filters */}
@@ -355,7 +405,9 @@ export default function ProductsPage() {
                 />
               </div>
               <div className="p-5">
-                <h3 className="text-lg font-semibold text-slate-900">{p.name}</h3>
+                <h3 className="text-lg font-semibold text-slate-900">
+                  {p.name}
+                </h3>
                 <p className="mt-2 text-sm text-slate-600">{p.description}</p>
               </div>
             </div>
