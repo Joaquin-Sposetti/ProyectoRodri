@@ -165,22 +165,6 @@ export default function ProductsPage() {
               >
                 <Instagram size={20} />
               </a>
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noreferrer"
-                className="text-slate-500 hover:text-easyliftBlue transition"
-              >
-                <Facebook size={20} />
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noreferrer"
-                className="text-slate-500 hover:text-easyliftBlue transition"
-              >
-                <Linkedin size={20} />
-              </a>
             </div>
 
             <a
