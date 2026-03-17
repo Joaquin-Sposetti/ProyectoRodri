@@ -13,11 +13,9 @@ import {
   Phone,
   MessageCircle,
   Instagram,
-  Facebook,
-  Linkedin,
 } from "lucide-react";
 
-const WHATSAPP = "https://wa.me/5490000000000"; // poné el número real
+const WHATSAPP = "https://wa.me/5493516501260"; // poné el número real
 
 const nav = [
   { id: "inicio", label: "Inicio" },
@@ -116,28 +114,12 @@ export default function Home() {
           <div className="hidden md:flex items-center gap-6 ml-8 pl-8 border-l border-slate-200">
             <div className="flex items-center gap-3">
               <a
-                href="https://www.instagram.com"
+                href="https://www.instagram.com/_easylift/?hl=es"
                 target="_blank"
                 className="text-slate-500 hover:text-easyliftBlue transition"
                 rel="noreferrer"
               >
                 <Instagram size={20} />
-              </a>
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                className="text-slate-500 hover:text-easyliftBlue transition"
-                rel="noreferrer"
-              >
-                <Facebook size={20} />
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                className="text-slate-500 hover:text-easyliftBlue transition"
-                rel="noreferrer"
-              >
-                <Linkedin size={20} />
               </a>
             </div>
 
@@ -153,13 +135,6 @@ export default function Home() {
                 Llamar
               </a>
 
-              <a
-                href="#contacto"
-                className="flex items-center justify-center gap-2 bg-easyliftBlue text-white px-5 py-2.5 rounded-lg hover:bg-easyliftBlueSoft transition shadow-sm hover:shadow-md font-medium leading-none"
-                style={{ minWidth: "160px", height: "45px" }}
-              >
-                Pedir presupuesto <ArrowRight size={16} />
-              </a>
             </div>
           </div>
 
@@ -243,13 +218,6 @@ export default function Home() {
                 >
                   <Phone size={16} />
                   WhatsApp
-                </a>
-                <a
-                  href="#contacto"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center justify-center gap-2 bg-easyliftBlue text-white font-semibold py-2 rounded-xl hover:bg-easyliftBlueSoft transition text-sm"
-                >
-                  Pedir presupuesto
                 </a>
               </div>
             </motion.div>
@@ -394,7 +362,6 @@ export default function Home() {
               <li>• Asesoramiento previo a la compra.</li>
               <li>• Entrega e instalación en planta.</li>
               <li>• Mantenimiento preventivo y correctivo.</li>
-              <li>• Posibilidad de alquiler según necesidad.</li>
             </ul>
           </motion.div>
 
@@ -440,7 +407,7 @@ export default function Home() {
                 title: "Propuesta",
                 items: [
                   "Armamos una oferta a medida.",
-                  "Combinamos compra, financiación o alquiler.",
+                  "Combinamos compra y financiación.",
                   "Coordinamos entrega y tiempos.",
                 ],
               },
@@ -551,46 +518,6 @@ export default function Home() {
                 WhatsApp
               </a>
             </div>
-          </motion.div>
-
-          <motion.div
-            {...fadeIn}
-            className="rounded-2xl bg-white shadow-lg ring-1 ring-slate-200 p-8 hover:shadow-xl transition-shadow"
-          >
-            <form className="space-y-5 text-sm">
-              <input
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-easyliftAccent"
-                placeholder="Nombre"
-                required
-              />
-              <input
-                type="email"
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-easyliftAccent"
-                placeholder="Email o teléfono"
-                required
-              />
-              <select
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none text-slate-800 focus:ring-2 focus:ring-easyliftAccent"
-                defaultValue=""
-              >
-                <option value="" disabled>
-                  ¿Qué estás buscando?
-                </option>
-                <option>Autoelevadores</option>
-                <option>Transpaletas / Zorras</option>
-                <option>Apiladores</option>
-                <option>Plataformas</option>
-                <option>Combinación de varios equipos</option>
-              </select>
-              <textarea
-                className="w-full min-h-[130px] rounded-xl border border-slate-300 px-4 py-3 outline-none text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-easyliftAccent"
-                placeholder="Depósito, tipo de carga, horas de uso, etc."
-                required
-              />
-              <button type="submit" className="btn btn-primary w-full justify-center">
-                Enviar consulta
-              </button>
-            </form>
           </motion.div>
         </div>
       </section>
