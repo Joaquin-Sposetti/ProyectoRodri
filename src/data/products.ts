@@ -22,7 +22,6 @@ export type Product = {
   image: string;
 };
 
-const FALLBACK_IMG = "/fondo2.png"; // existe en tu public (si querés cambiá por otra)
 
 export const PRODUCTS: Product[] = [
   // ================= AUTOELEVADORES (tenés 3 imágenes) =================

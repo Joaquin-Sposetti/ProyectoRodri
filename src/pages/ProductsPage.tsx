@@ -8,8 +8,6 @@ import {
   Menu,
   Phone,
   Instagram,
-  Facebook,
-  Linkedin,
 } from "lucide-react";
 import {
   CATEGORY_LABEL,
