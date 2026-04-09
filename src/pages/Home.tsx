@@ -13,6 +13,11 @@ import {
   Phone,
   MessageCircle,
   Instagram,
+  Truck,
+  Package,
+  Layers3,
+  PanelTop,
+  Sparkles,
 } from "lucide-react";
 
 const WHATSAPP = "https://wa.me/5493516501260"; // poné el número real
@@ -297,53 +302,94 @@ export default function Home() {
             depósitos, industrias, centros logísticos y más.
           </motion.p>
 
-          <div className="mt-10 grid gap-6 md:grid-cols-4">
-            {[
-              {
-                title: "Autoelevadores",
-                slug: "autoelevadores",
-                icon: <Shield className="text-easyliftBlue" />,
-                desc: "Equipos para trabajo intenso, eléctricos y a combustión.",
-              },
-              {
-                title: "Transpaletas / Zorras",
-                slug: "transpaletas",
-                icon: <Wrench className="text-easyliftBlue" />,
-                desc: "Movimiento interno ágil y seguro de pallets.",
-              },
-              {
-                title: "Apiladores",
-                slug: "apiladores",
-                icon: <Timer className="text-easyliftBlue" />,
-                desc: "Aprovechá la altura de tu depósito al máximo.",
-              },
-              {
-                title: "Plataformas",
-                slug: "plataformas",
-                icon: <Star className="text-easyliftBlue" />,
-                desc: "Trabajos en altura con máxima seguridad y estabilidad.",
-              },
-            ].map((c) => (
-              <motion.button
-                key={c.title}
-                {...fadeIn}
-                type="button"
-                onClick={() => goCatalogTop(`/productos?cat=${c.slug}`)}
-                className="rounded-2xl bg-[#f6f7ff] shadow-md ring-1 ring-slate-200 p-6 transition-all hover:shadow-lg text-center"
-              >
-                <div className="flex items-center justify-center mb-3">
-                  <div className="rounded-2xl bg-[#e1e6ff] p-3">{c.icon}</div>
-                </div>
-                <h3 className="text-lg font-semibold text-slate-900">
-                  {c.title}
-                </h3>
-                <p className="mt-3 text-sm text-slate-600">{c.desc}</p>
-                <span className="mt-4 inline-flex items-center gap-2 text-easyliftBlue hover:underline font-medium">
-                  Ver en catálogo <ArrowRight size={16} />
-                </span>
-              </motion.button>
-            ))}
-          </div>
+          <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-5">
+  {[
+    {
+  title: "Autoelevadores",
+  slug: "autoelevadores",
+  icon: (
+    <img
+      src="/icons/autoelevador.png"
+      alt="Autoelevadores"
+      className="h-24 w-24 object-contain"
+    />
+  ),
+  desc: "Equipos para trabajo intenso, eléctricos y a combustión.",
+},
+    {
+  title: "Transpaletas / Zorras",
+  slug: "transpaletas",
+  icon: (
+    <img
+      src="/icons/transpaleta.png"
+      alt="Transpaletas"
+      className="h-24 w-24 object-contain"
+    />
+  ),
+  desc: "Movimiento interno ágil y seguro de pallets.",
+},
+    {
+  title: "Apiladores",
+  slug: "apiladores",
+  icon: (
+    <img
+      src="/icons/apilador.png"
+      alt="Apiladores"
+      className="h-24 w-24 object-contain"
+    />
+  ),
+  desc: "Aprovechá la altura de tu depósito al máximo.",
+},
+    {
+  title: "Plataformas",
+  slug: "plataformas",
+  icon: (
+    <img
+      src="/icons/plataforma.png"
+      alt="Plataformas"
+      className="h-24 w-24 object-contain"
+    />
+  ),
+  desc: "Trabajos en altura seguros y estables.",
+},
+    {
+      title: "Limpieza",
+      slug: "limpieza",
+      icon: (
+  <img
+    src="/icons/limpieza.png"
+    alt="Limpieza"
+    className="h-24 w-24 object-contain"
+  />
+),
+      desc: "Limpieza industrial de alto rendimiento.",
+    },
+  ].map((c) => (
+    <motion.button
+      key={c.title}
+      {...fadeIn}
+      type="button"
+      onClick={() => goCatalogTop(`/productos?cat=${c.slug}`)}
+      className="rounded-2xl bg-[#f6f7ff] p-6 text-center shadow-md ring-1 ring-slate-200 transition-all hover:shadow-lg"
+    >
+      <div className="mb-4 flex items-center justify-center">
+  <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-[#e1e6ff] mx-auto transition-transform group-hover:scale-110">
+    {c.icon}
+  </div>
+</div>
+
+      <h3 className="text-lg font-semibold text-slate-900">
+        {c.title}
+      </h3>
+
+      <p className="mt-3 text-sm text-slate-600">{c.desc}</p>
+
+      <span className="mt-4 inline-flex items-center gap-2 font-medium text-easyliftBlue hover:underline">
+        Ver en catálogo <ArrowRight size={16} />
+      </span>
+    </motion.button>
+  ))}
+</div>
         </div>
       </section>
 
