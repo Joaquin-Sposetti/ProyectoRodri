@@ -5,19 +5,10 @@ import {
   Menu,
   X,
   ArrowRight,
-  Shield,
-  Timer,
-  Wrench,
-  Star,
   CheckCircle2,
   Phone,
   MessageCircle,
   Instagram,
-  Truck,
-  Package,
-  Layers3,
-  PanelTop,
-  Sparkles,
 } from "lucide-react";
 
 const WHATSAPP = "https://wa.me/5493516501260"; // poné el número real
