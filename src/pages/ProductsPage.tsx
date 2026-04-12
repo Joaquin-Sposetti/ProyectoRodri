@@ -257,77 +257,121 @@ export default function ProductsPage() {
         )}
       </AnimatePresence>
 
-      <div className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:pt-12">
-        <div className="grid min-h-[52px] grid-cols-1 gap-3 sm:grid-cols-2 sm:items-center sm:gap-4">
+      <div className="mx-auto max-w-7xl px-4 pb-16 pt-4 sm:pt-12">
+        {/* TOP BAR: Volver y Limpiar en una sola línea */}
+        <div className="flex items-center justify-between mb-4">
           <button
             onClick={goHomeTop}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-easyliftBlue hover:underline sm:justify-self-start"
+            className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-easyliftBlue/60 hover:text-easyliftBlue transition-colors"
             type="button"
           >
-            <ArrowLeft size={16} /> Volver
+            <ArrowLeft size={14} /> Volver
           </button>
 
-          <button
-            onClick={clearFilters}
-            className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition sm:min-w-[150px] sm:w-auto sm:justify-self-end ${
-              hasFilters ? "opacity-100" : "pointer-events-none opacity-0"
-            }`}
-            type="button"
-          >
-            <X size={16} /> Limpiar filtros
-          </button>
+          <AnimatePresence>
+            {hasFilters && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                onClick={clearFilters}
+                className="flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1.5 text-[11px] font-bold text-red-500 ring-1 ring-red-100"
+                type="button"
+              >
+                <X size={12} /> Limpiar filtros
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
 
-        <div className="mt-4">
-          <h1 className="text-2xl font-bold tracking-tight text-easyliftBlue sm:text-3xl md:text-5xl">
+        {/* Título más compacto en móvil */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">
             Catálogo
           </h1>
         </div>
 
-        <div className="mt-6 rounded-[24px] bg-white p-4 shadow-[0_10px_30px_rgba(2,6,23,0.06)] ring-1 ring-slate-200 sm:mt-8 sm:p-6">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="grid h-11 w-11 shrink-0 place-content-center rounded-2xl bg-slate-50 ring-1 ring-slate-200 sm:h-12 sm:w-12">
-              <Search className="text-slate-700" size={20} />
+        {/* BUSCADOR COMPACTO */}
+        <div className="z-30 -mx-4 bg-gradient-to-b from-[#f8faff] to-transparent px-4 pb-6 pt-2 backdrop-blur-sm sm:relative sm:top-0 sm:mx-0 sm:bg-none sm:px-0 sm:backdrop-blur-none">
+          <div className="relative flex flex-col gap-4 rounded-[28px] bg-white p-3 shadow-xl shadow-slate-200/50 ring-1 ring-slate-200 sm:p-4">
+            
+            {/* Input con Icono */}
+            <div className="relative flex items-center">
+              <Search className="absolute left-4 text-slate-700" size={20} />
+              <input
+                value={q}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setSearch(e.target.value);
+                }}
+                placeholder="Buscar..."
+                className="h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 pl-11 text-[15px] text-slate-800 outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-easyliftAccent sm:h-12"
+              />
             </div>
 
-            <input
-              value={q}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setSearch(e.target.value);
-              }}
-              placeholder="Buscar..."
-              className="h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 text-[15px] text-slate-800 outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-easyliftAccent sm:h-12"
-            />
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-2 sm:mt-5">
-            <button
-              onClick={() => setCategory(null)}
-              className={`h-10 rounded-2xl px-4 text-sm font-medium ring-1 transition sm:h-11 ${
-                !cat
-                  ? "bg-easyliftBlue text-white ring-easyliftBlue shadow-[0_10px_20px_rgba(29,78,216,0.20)]"
-                  : "bg-white text-slate-700 ring-slate-200 hover:bg-slate-50"
-              }`}
-              type="button"
-            >
-              Todos
-            </button>
-
-            {categories.map((c) => (
-              <button
-                key={c}
-                onClick={() => setCategory(c)}
-                className={`h-10 rounded-2xl px-4 text-sm font-medium ring-1 transition sm:h-11 ${
-                  cat === c
-                    ? "bg-easyliftBlue text-white ring-easyliftBlue shadow-[0_10px_20px_rgba(29,78,216,0.20)]"
-                    : "bg-white text-slate-700 ring-slate-200 hover:bg-slate-50"
-                }`}
-                type="button"
+            {/* Categorías con separación ajustada */}
+            {/* Contenedor de Categorías con Flechas Dinámicas */}
+            <div className="relative mt-2 group">
+              {/* Contenedor del Scroll */}
+              <div 
+                id="category-container"
+                className="flex gap-2 overflow-x-auto pb-4 no-scrollbar select-none scroll-smooth"
+                onScroll={(e) => {
+                  const target = e.currentTarget;
+                  const leftArrow = document.getElementById('arrow-left');
+                  const rightArrow = document.getElementById('arrow-right');
+                  
+                  if (leftArrow) leftArrow.style.opacity = target.scrollLeft > 10 ? "1" : "0";
+                  if (rightArrow) {
+                    const isAtEnd = target.scrollLeft + target.offsetWidth >= target.scrollWidth - 10;
+                    rightArrow.style.opacity = isAtEnd ? "0" : "1";
+                  }
+                }}
               >
-                {CATEGORY_LABEL[c]}
-              </button>
-            ))}
+                <button
+                  onClick={() => setCategory(null)}
+                  className={`h-10 shrink-0 whitespace-nowrap rounded-2xl px-4 text-sm font-medium ring-1 transition sm:h-11 ${
+                    !cat
+                      ? "bg-easyliftBlue text-white ring-easyliftBlue shadow-[0_10px_20px_rgba(29,78,216,0.20)]"
+                      : "bg-white text-slate-700 ring-slate-200 hover:bg-slate-50"
+                  }`}
+                  type="button"
+                >
+                  Todos
+                </button>
+
+                {categories.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setCategory(c)}
+                    className={`h-10 shrink-0 whitespace-nowrap rounded-2xl px-4 text-sm font-medium ring-1 transition sm:h-11 ${
+                      cat === c
+                        ? "bg-easyliftBlue text-white ring-easyliftBlue shadow-[0_10px_20px_rgba(29,78,216,0.20)]"
+                        : "bg-white text-slate-700 ring-slate-200 hover:bg-slate-50"
+                    }`}
+                    type="button"
+                  >
+                    {CATEGORY_LABEL[c]}
+                  </button>
+                ))}
+              </div>
+
+              {/* Flecha Izquierda (oculta por defecto) */}
+              <div 
+                id="arrow-left"
+                className="pointer-events-none absolute left-0 top-0 flex h-10 w-8 items-center justify-start bg-gradient-to-r from-white to-transparent opacity-0 transition-opacity duration-300 sm:h-11"
+              >
+                <ChevronLeft size={16} className="text-easyliftBlue" />
+              </div>
+
+              {/* Flecha Derecha (visible por defecto) */}
+              <div 
+                id="arrow-right"
+                className="pointer-events-none absolute right-0 top-0 flex h-10 w-8 items-center justify-end bg-gradient-to-l from-white to-transparent transition-opacity duration-300 sm:h-11"
+              >
+                <ChevronRight size={16} className="text-easyliftBlue" />
+              </div>
+            </div>
           </div>
         </div>
 
