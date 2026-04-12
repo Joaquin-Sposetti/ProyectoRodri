@@ -37,95 +37,6 @@ const categories: ProductCategory[] = [
   "limpieza",
 ];
 
-function normalizeText(text: string) {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function formatFeature(feature: string) {
-  return feature
-    .trim()
-    .replace(/\s+/g, " ")
-    .replace(/\s*:\s*/g, ": ")
-    .replace(/\bmax\.\b/gi, "Máx.")
-    .replace(/\balt\.\b/gi, "Alt.")
-    .replace(/\bdist\.\b/gi, "Dist.")
-    .replace(/\bdim\.\b/gi, "Dim.")
-    .replace(/\bautonomia\b/gi, "Autonomía")
-    .replace(/\bmasstil\b/gi, "Mástil")
-    .replace(/\bmastil\b/gi, "Mástil")
-    .replace(/\bergonomico\b/gi, "ergonómico")
-    .replace(/\bneumaticas\b/gi, "neumáticas");
-}
-
-function parseProductContent(product: Product) {
-  const raw = product.description.replace(/\s+/g, " ").trim();
-
-  const parts = raw
-    .split("/")
-    .map((item) => item.trim())
-    .filter(Boolean);
-
-  const longTextParts = parts.filter((item) => item.includes("."));
-  const specsParts = parts.filter((item) => !item.includes("."));
-
-  let description = "";
-  const features: string[] = [];
-  const seen = new Set<string>();
-
-  if (longTextParts.length > 0) {
-    description = longTextParts[0].trim();
-
-    const extraSentences = longTextParts
-      .slice(1)
-      .join(" ")
-      .split(".")
-      .map((s) => s.trim())
-      .filter(Boolean);
-
-    for (const sentence of extraSentences) {
-      const formatted = formatFeature(sentence);
-      const key = normalizeText(formatted);
-      if (!seen.has(key) && normalizeText(description) !== key) {
-        seen.add(key);
-        features.push(formatted);
-      }
-    }
-  } else if (parts.length > 0) {
-    description = parts[0].trim();
-  }
-
-  for (const spec of specsParts) {
-    const formatted = formatFeature(spec);
-    const key = normalizeText(formatted);
-
-    if (formatted && !seen.has(key) && key !== normalizeText(description)) {
-      seen.add(key);
-      features.push(formatted);
-    }
-  }
-
-  const normalizedDescription = normalizeText(description);
-
-  const cleanFeatures = features.filter((feature) => {
-    const normalizedFeature = normalizeText(feature);
-    return (
-      normalizedFeature &&
-      normalizedFeature !== normalizedDescription &&
-      !normalizedDescription.includes(normalizedFeature)
-    );
-  });
-
-  return {
-    description,
-    features: cleanFeatures,
-  };
-}
-
 export default function ProductsPage() {
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -157,10 +68,9 @@ export default function ProductsPage() {
     const query = qParam.trim().toLowerCase();
 
     return PRODUCTS.filter((p) => {
-      const parsed = parseProductContent(p);
       const okCat = !cat || p.category === cat;
       const haystack =
-        `${p.id} ${p.name} ${parsed.description} ${parsed.features.join(" ")}`.toLowerCase();
+        `${p.id} ${p.name} ${p.description} ${p.features.join(" ")}`.toLowerCase();
       const okQuery = !query || haystack.includes(query);
       return okCat && okQuery;
     });
@@ -227,14 +137,14 @@ export default function ProductsPage() {
     e.stopPropagation();
     if (selectedProduct && selectedProduct.images.length > 1) {
       setCurrentImgIndex(
-        (prev) => (prev - 1 + selectedProduct.images.length) % selectedProduct.images.length
+        (prev) =>
+          (prev - 1 + selectedProduct.images.length) %
+          selectedProduct.images.length
       );
     }
   };
 
-  const selectedParsed = selectedProduct
-    ? parseProductContent(selectedProduct)
-    : null;
+  const selectedFeatures = selectedProduct?.features ?? [];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-[#edf2ff] text-slate-900">
@@ -422,46 +332,42 @@ export default function ProductsPage() {
         </div>
 
         <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((p) => {
-            const parsed = parseProductContent(p);
+          {filtered.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => openModal(p)}
+              className="overflow-hidden rounded-[26px] bg-white text-left shadow-[0_14px_30px_rgba(15,23,42,0.07)] ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(15,23,42,0.10)]"
+            >
+              <div className="flex h-56 w-full items-center justify-center overflow-hidden bg-[#edf2f7]">
+                <img
+                  src={p.images[0]}
+                  alt={p.name}
+                  className="h-full w-full object-contain p-5"
+                  loading="lazy"
+                />
+              </div>
 
-            return (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => openModal(p)}
-                className="overflow-hidden rounded-[26px] bg-white text-left shadow-[0_14px_30px_rgba(15,23,42,0.07)] ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(15,23,42,0.10)]"
-              >
-                <div className="flex h-56 w-full items-center justify-center overflow-hidden bg-[#edf2f7]">
-                  <img
-                    src={p.images[0]}
-                    alt={p.name}
-                    className="h-full w-full object-contain p-5"
-                    loading="lazy"
-                  />
-                </div>
+              <div className="p-5 sm:p-6">
+                <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                  {p.id}
+                </span>
 
-                <div className="p-5 sm:p-6">
-                  <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                    {p.id}
-                  </span>
+                <h3 className="mt-4 text-xl font-semibold leading-tight text-slate-900">
+                  {p.name}
+                </h3>
 
-                  <h3 className="mt-4 text-xl font-semibold leading-tight text-slate-900">
-                    {p.name}
-                  </h3>
-
-                  <p className="mt-3 line-clamp-3 text-[15px] leading-7 text-slate-600">
-                    {parsed.description}
-                  </p>
-                </div>
-              </button>
-            );
-          })}
+                <p className="mt-3 line-clamp-3 text-[15px] leading-7 text-slate-600">
+                  {p.description}
+                </p>
+              </div>
+            </button>
+          ))}
         </div>
       </div>
 
       <AnimatePresence>
-        {selectedProduct && selectedParsed && (
+        {selectedProduct && (
           <motion.div
             className="fixed inset-0 z-[60] bg-black/70 p-4 backdrop-blur-sm md:p-8"
             initial={{ opacity: 0 }}
@@ -490,7 +396,9 @@ export default function ProductsPage() {
 
                   <div
                     className="flex h-full w-full cursor-pointer items-center justify-center overflow-hidden"
-                    onClick={selectedProduct.images.length > 1 ? nextImage : undefined}
+                    onClick={
+                      selectedProduct.images.length > 1 ? nextImage : undefined
+                    }
                   >
                     <AnimatePresence mode="wait">
                       <motion.img
@@ -502,7 +410,9 @@ export default function ProductsPage() {
                         src={selectedProduct.images[currentImgIndex]}
                         alt={selectedProduct.name}
                         className={`h-full w-full object-contain ${
-                          selectedProduct.id === "CTS20S" ? "scale-[0.88] -translate-y-4" : ""
+                          selectedProduct.id === "CTS20S"
+                            ? "scale-[0.88] -translate-y-4"
+                            : ""
                         }`}
                       />
                     </AnimatePresence>
@@ -538,7 +448,7 @@ export default function ProductsPage() {
                     </button>
                   </div>
 
-                  <div className="flex-1 overflow-y-auto p-5 md:p-6">
+                  <div className="flex-1 min-w-0 overflow-y-auto p-5 md:p-6">
                     <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
                         Categoría
@@ -553,21 +463,21 @@ export default function ProductsPage() {
                         Descripción
                       </h3>
                       <p className="mt-2 text-[15px] leading-7 text-slate-700">
-                        {selectedParsed.description}
+                        {selectedProduct.description}
                       </p>
                     </div>
 
-                    {selectedParsed.features.length > 0 && (
+                    {selectedFeatures.length > 0 && (
                       <div className="mt-6">
                         <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
                           Características
                         </h3>
 
-                        <ul className="mt-3 space-y-1.5 pl-4">
-                          {selectedParsed.features.map((feature, index) => (
+                        <ul className="mt-3 space-y-2 pl-5">
+                          {selectedFeatures.map((feature, index) => (
                             <li
                               key={`${selectedProduct.id}-feature-${index}`}
-                              className="list-disc text-[13px] leading-5 text-slate-600 marker:text-easyliftBlue"
+                              className="list-disc whitespace-normal break-words text-sm leading-6 text-slate-700 marker:text-easyliftBlue"
                             >
                               {feature}
                             </li>
@@ -604,19 +514,6 @@ export default function ProductsPage() {
                         </div>
                       </div>
                     )}
-                  </div>
-
-                  <div className="border-t border-slate-200 p-5 md:p-6">
-                    <a
-                      href={`${WHATSAPP}?text=${encodeURIComponent(
-                        `Hola, me interesa el producto ${selectedProduct.name} (${selectedProduct.id}).`
-                      )}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex w-full items-center justify-center rounded-2xl bg-easyliftBlue px-5 py-3 text-sm font-semibold text-white transition hover:bg-easyliftBlueSoft"
-                    >
-                      Consultar por WhatsApp
-                    </a>
                   </div>
                 </div>
               </div>

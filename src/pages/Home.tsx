@@ -13,6 +13,25 @@ import {
 
 const WHATSAPP = "https://wa.me/5493516501260"; // poné el número real
 
+const clientLogos = [
+  "/clientes/afason.png",
+  "/clientes/berlim.png",
+  "/clientes/c.jpeg",
+  "/clientes/c.jpg",
+  "/clientes/c.png",
+  "/clientes/delfor.jpeg",
+  "/clientes/dolomita.png",
+  "/clientes/estdulce.webp",
+  "/clientes/Fabrica-IsoTipo-LogoNombre.jpg",
+  "/clientes/ingeocropped-logo-236x78.png",
+  "/clientes/juncalcor.jpg",
+  "/clientes/marcilli.png",
+  "/clientes/mca-logo.png",
+  "/clientes/mesal.png",
+  "/clientes/profast.png",
+  "/clientes/totalclean.jpg",
+];
+
 const nav = [
   { id: "inicio", label: "Inicio" },
   { id: "productos", label: "Productos" },
@@ -419,16 +438,18 @@ export default function Home() {
       {/* CÓMO TRABAJAMOS */}
       <section id="pasos" className="section bg-white">
         <div className="container">
+          <div  className="mx-auto max-w-3xl text-center">
           <motion.div {...fadeIn} className="max-w-3xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-easyliftBlue">
+            <h2 className="stext-3xl md:text-4xl font-bold text-easyliftBlue">
               Cómo trabajamos
             </h2>
             <p className="mt-3 text-slate-600">
               Buscamos que el proceso sea claro, rápido y sin sorpresas.
             </p>
           </motion.div>
+        </div>
 
-          <div className="mt-10 grid gap-6 md:gap-8 md:grid-cols-3">
+          <div className="mt-10 grid gap-6 md:gap-8 md:grid-cols-4">
             {[
               {
                 step: "1",
@@ -450,13 +471,21 @@ export default function Home() {
               },
               {
                 step: "3",
-                title: "Entrega y soporte",
+                title: "Entrega",
                 items: [
                   "Entregamos y dejamos el equipo operativo.",
                   "Capacitación básica para el personal.",
-                  "Mantenimiento y soporte postventa.",
                 ],
               },
+              {
+  step: "4",
+  title: "Servicio postventa",
+  items: [
+    "Todos nuestros equipos cuentan con garantía.",
+    "Disponemos de repuestos originales.",
+    "Brindamos soporte para asegurar continuidad operativa.",
+  ],
+}
             ].map((step) => (
               <motion.div
                 key={step.step}
@@ -528,11 +557,54 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <section id="clientes" className="section bg-gradient-to-b from-slate-50 to-white">
+  <div className="mx-auto max-w-7xl px-4">
+    <div className="mx-auto max-w-3xl text-center">
+      <span className="inline-flex items-center rounded-full border border-easyliftBlue/20 bg-easyliftBlue/10 px-4 py-1 text-sm font-medium text-easyliftBlue">
+        Clientes
+      </span>
+
+      <h2 className="mt-4 text-3xl font-bold tracking-tight text-easyliftBlue sm:text-4xl md:text-5xl ">
+        Empresas que confían en nosotros
+      </h2>
+
+    </div>
+  </div>
+
+  <div className="relative mt-12 w-full overflow-hidden">
+    <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-8 bg-gradient-to-r from-[#edf2ff] to-transparent md:w-12" />
+    <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-8 bg-gradient-to-l from-[#edf2ff] to-transparent md:w-12" />
+
+    <motion.div
+      className="flex w-max gap-6"
+      animate={{ x: ["0%", "-50%"] }}
+      transition={{
+        duration: 60,
+        repeat: Infinity,
+        ease: "linear",
+      }}
+    >
+      {[...clientLogos, ...clientLogos].map((logo, index) => (
+        <div
+          key={`${logo}-${index}`}
+          className="flex h-28 w-[200px] shrink-0 items-center justify-center rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_10px_30px_rgba(15,23,42,0.05)] transition duration-300 hover:-translate-y-1 hover:border-easyliftBlue/30 hover:shadow-[0_18px_40px_rgba(15,23,42,0.10)] sm:h-32 sm:w-[220px]"
+        >
+          <img
+            src={logo}
+            alt={`Cliente ${index + 1}`}
+            className="h-auto max-h-10 w-auto max-w-[140px] object-contain transition duration-300 sm:max-h-12 sm:max-w-[160px]"
+            loading="lazy"
+          />
+        </div>
+      ))}
+    </motion.div>
+  </div>
+</section>
 
       {/* CONTACTO */}
       <section
         id="contacto"
-        className="section bg-gradient-to-b from-slate-50 to-white"
+        className="relative overflow-hidden py-20 md:py-24"
       >
         <div className="container grid gap-12 md:grid-cols-2 items-start">
           <motion.div {...fadeIn}>
