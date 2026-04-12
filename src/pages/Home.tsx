@@ -1,5 +1,10 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useAnimationFrame,
+} from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
   Menu,
@@ -38,6 +43,7 @@ const nav = [
   { id: "servicios", label: "Servicios" },
   { id: "pasos", label: "Proceso" },
   { id: "sectores", label: "Sectores" },
+  { id: "clientes", label: "Clientes" },
   { id: "contacto", label: "Contacto" },
 ];
 
@@ -50,31 +56,69 @@ const fadeIn = {
 
 export default function Home() {
   const [open, setOpen] = useState(false);
+  const [isClientCarouselPaused, setIsClientCarouselPaused] = useState(false);
+
   const navigate = useNavigate();
 
+  const clientTrackRef = useRef<HTMLDivElement>(null);
+  const clientLoopWidthRef = useRef(0);
+  const clientX = useMotionValue(0);
+
   useEffect(() => {
-    if (location.hash) {
-      const id = location.hash.replace("#", "");
+    if (window.location.hash) {
+      const id = window.location.hash.replace("#", "");
       const element = document.getElementById(id);
       if (element) {
-        // Le damos un mini respiro de 100ms para que cargue el DOM
         setTimeout(() => {
           element.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 100);
       }
     }
-  }, [location]);
+  }, []);
 
-  // bloquear scroll cuando el menú está abierto
   useEffect(() => {
     if (open) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
+
     return () => {
       document.body.style.overflow = "";
     };
   }, [open]);
 
-  // helper seguro para navegar y arrancar arriba
+  useEffect(() => {
+    const measureClientCarousel = () => {
+      if (!clientTrackRef.current) return;
+      const totalWidth = clientTrackRef.current.scrollWidth;
+      clientLoopWidthRef.current = totalWidth / 2;
+    };
+
+    measureClientCarousel();
+    window.addEventListener("resize", measureClientCarousel);
+
+    return () => {
+      window.removeEventListener("resize", measureClientCarousel);
+    };
+  }, []);
+
+  useAnimationFrame((_, delta) => {
+  if (isClientCarouselPaused) return;
+
+  const loopWidth = clientLoopWidthRef.current;
+  if (!loopWidth) return;
+
+  const speed = 0.05; // Ajustá esto a tu gusto
+  let nextX = clientX.get() - delta * speed;
+
+  // Lógica de loop infinito
+  if (nextX <= -loopWidth) {
+    nextX += loopWidth;
+  } else if (nextX > 0) {
+    nextX -= loopWidth;
+  }
+
+  clientX.set(nextX);
+});
+
   const goCatalogTop = (url: string) => {
     navigate(url);
     setTimeout(() => {
@@ -83,14 +127,12 @@ export default function Home() {
       }
     }, 0);
   };
-  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-[#edf2ff] text-slate-900">
       {/* NAVBAR */}
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-lg shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-        <div className="max-w-7xl mx-auto flex h-20 items-center justify-between px-4">
-          {/* Logo */}
+        <div className="max-w-7xl mx-auto flex h-16 md:h-20 items-center justify-between px-4">
           <a
             href="#inicio"
             className="flex items-center hover:scale-[1.03] transition-transform"
@@ -98,12 +140,11 @@ export default function Home() {
             <img
               src="/easylift-logo.png"
               alt="Easylift"
-              className="h-14 sm:h-16 md:h-20 w-auto object-contain"
+              className="h-10 sm:h-12 md:h-20 w-auto object-contain"
               style={{ minWidth: "150px" }}
             />
           </a>
 
-          {/* Links desktop */}
           <nav className="hidden md:flex items-center gap-10 ml-10">
             {nav.map((n) => (
               <a
@@ -115,7 +156,6 @@ export default function Home() {
               </a>
             ))}
 
-            {/* Link extra al catálogo (igual que los otros + animación) */}
             <button
               onClick={() => goCatalogTop("/productos")}
               className="text-[15px] font-medium text-slate-600 hover:text-easyliftBlue transition-colors"
@@ -125,7 +165,6 @@ export default function Home() {
             </button>
           </nav>
 
-          {/* Redes + botones desktop */}
           <div className="hidden md:flex items-center gap-6 ml-8 pl-8 border-l border-slate-200">
             <div className="flex items-center gap-3">
               <a
@@ -149,11 +188,9 @@ export default function Home() {
                 <Phone size={18} />
                 Llamar
               </a>
-
             </div>
           </div>
 
-          {/* Botón menú mobile */}
           <button
             className="md:hidden rounded-xl p-2 hover:bg-slate-100"
             onClick={() => setOpen(true)}
@@ -164,7 +201,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* MENÚ MOBILE CON FONDO DIFUMINADO (solo fondo, menú no) */}
+      {/* MENÚ MOBILE */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -243,9 +280,8 @@ export default function Home() {
       {/* HERO */}
       <section
         id="inicio"
-        className="relative min-h-screen md:h-[80vh] flex flex-col items-center justify-center bg-gradient-to-b from-white to-[#f2f4ff] md:overflow-hidden"
+        className="relative min-h-[85vh] md:h-[80vh] flex flex-col items-center justify-center bg-gradient-to-b from-white to-[#f2f4ff] md:overflow-hidden"
       >
-        {/* Fondo slideshow */}
         <div className="absolute inset-0 z-0">
           <div className="slideshow">
             <div className="slide">
@@ -261,15 +297,14 @@ export default function Home() {
           <div className="absolute inset-0 bg-slate-900/55" />
         </div>
 
-        {/* Contenido hero */}
         <div className="relative z-10 text-center text-white px-4 w-full pt-24 pb-12">
           <img
             src="/easylift-logo.png"
             alt="Easylift"
-            className="mx-auto mb-8 w-72 sm:w-80 md:w-96 lg:w-[26rem] drop-shadow-2xl animate-fadeIn"
+            className="mx-auto mb-6 w-56 sm:w-64 md:w-96 lg:w-[26rem] drop-shadow-2xl animate-fadeIn"
           />
           <div className="max-w-3xl mx-auto">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-semibold drop-shadow-2xl">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold drop-shadow-2xl">
               Equipos de elevación que{" "}
               <span className="text-easyliftAccent font-bold">optimizarán</span>{" "}
               tu depósito, tu logística y tu producción.
@@ -279,13 +314,13 @@ export default function Home() {
               asesoramiento especializado, entrega rápida y servicio postventa.
             </p>
             <div className="mt-6 flex flex-wrap gap-4 justify-center">
-              <a href="#contacto" className="btn btn-primary">
+              <a href="#contacto" className="btn btn-primary py-3 px-6 text-sm sm:text-base">
                 Pedir cotización <ArrowRight size={18} />
               </a>
               <button
                 type="button"
                 onClick={() => goCatalogTop("/productos")}
-                className="btn btn-outline"
+                className="btn bg-white/90 text-easyliftBlue py-3 px-6 text-sm sm:text-base hover:bg-white transition"
               >
                 Ver catálogo
               </button>
@@ -294,7 +329,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* PRODUCTOS (cards que redirigen al catálogo filtrado) */}
+      {/* PRODUCTOS */}
       <section id="productos" className="section bg-white">
         <div className="container">
           <motion.h2
@@ -312,94 +347,94 @@ export default function Home() {
             depósitos, industrias, centros logísticos y más.
           </motion.p>
 
-          <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-5">
-  {[
-    {
-  title: "Autoelevadores",
-  slug: "autoelevadores",
-  icon: (
-    <img
-      src="/icons/autoelevador.png"
-      alt="Autoelevadores"
-      className="h-24 w-24 object-contain"
-    />
-  ),
-  desc: "Equipos para trabajo intenso, eléctricos y a combustión.",
-},
-    {
-  title: "Transpaletas / Zorras",
-  slug: "transpaletas",
-  icon: (
-    <img
-      src="/icons/transpaleta.png"
-      alt="Transpaletas"
-      className="h-24 w-24 object-contain"
-    />
-  ),
-  desc: "Movimiento interno ágil y seguro de pallets.",
-},
-    {
-  title: "Apiladores",
-  slug: "apiladores",
-  icon: (
-    <img
-      src="/icons/apilador.png"
-      alt="Apiladores"
-      className="h-24 w-24 object-contain"
-    />
-  ),
-  desc: "Aprovechá la altura de tu depósito al máximo.",
-},
-    {
-  title: "Plataformas",
-  slug: "plataformas",
-  icon: (
-    <img
-      src="/icons/plataforma.png"
-      alt="Plataformas"
-      className="h-24 w-24 object-contain"
-    />
-  ),
-  desc: "Trabajos en altura seguros y estables.",
-},
-    {
-      title: "Limpieza",
-      slug: "limpieza",
-      icon: (
-  <img
-    src="/icons/limpieza.png"
-    alt="Limpieza"
-    className="h-24 w-24 object-contain"
-  />
-),
-      desc: "Limpieza industrial de alto rendimiento.",
-    },
-  ].map((c) => (
-    <motion.button
-      key={c.title}
-      {...fadeIn}
-      type="button"
-      onClick={() => goCatalogTop(`/productos?cat=${c.slug}`)}
-      className="rounded-2xl bg-[#f6f7ff] p-6 text-center shadow-md ring-1 ring-slate-200 transition-all hover:shadow-lg"
-    >
-      <div className="mb-4 flex items-center justify-center">
-  <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-[#e1e6ff] mx-auto transition-transform group-hover:scale-110">
-    {c.icon}
-  </div>
-</div>
+          <div className="mt-10 grid gap-4 sm:gap-6 grid-cols-2 md:grid-cols-2 xl:grid-cols-5">
+            {[
+              {
+                title: "Autoelevadores",
+                slug: "autoelevadores",
+                icon: (
+                  <img
+                    src="/icons/autoelevador.png"
+                    alt="Autoelevadores"
+                    className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 object-contain"
+                  />
+                ),
+                desc: "Equipos para trabajo intenso, eléctricos y a combustión.",
+              },
+              {
+                title: "Transpaletas / Zorras",
+                slug: "transpaletas",
+                icon: (
+                  <img
+                    src="/icons/transpaleta.png"
+                    alt="Transpaletas"
+                    className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 object-contain"
+                  />
+                ),
+                desc: "Movimiento interno ágil y seguro de pallets.",
+              },
+              {
+                title: "Apiladores",
+                slug: "apiladores",
+                icon: (
+                  <img
+                    src="/icons/apilador.png"
+                    alt="Apiladores"
+                    className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 object-contain"
+                  />
+                ),
+                desc: "Aprovechá la altura de tu depósito al máximo.",
+              },
+              {
+                title: "Plataformas",
+                slug: "plataformas",
+                icon: (
+                  <img
+                    src="/icons/plataforma.png"
+                    alt="Plataformas"
+                    className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 object-contain"
+                  />
+                ),
+                desc: "Trabajos en altura seguros y estables.",
+              },
+              {
+                title: "Limpieza",
+                slug: "limpieza",
+                icon: (
+                  <img
+                    src="/icons/limpieza.png"
+                    alt="Limpieza"
+                    className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 object-contain"
+                  />
+                ),
+                desc: "Limpieza industrial de alto rendimiento.",
+              },
+            ].map((c) => (
+              <motion.button
+                key={c.title}
+                {...fadeIn}
+                type="button"
+                onClick={() => goCatalogTop(`/productos?cat=${c.slug}`)}
+                className="rounded-2xl bg-[#f6f7ff] p-4 sm:p-6 text-center shadow-md ring-1 ring-slate-200 transition-all hover:shadow-lg active:scale-[0.98] transition-transform"
+              >
+                <div className="mb-4 flex items-center justify-center">
+                  <div className="flex h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 items-center justify-center rounded-2xl bg-[#e1e6ff] mx-auto">
+                    {c.icon}
+                  </div>
+                </div>
 
-      <h3 className="text-lg font-semibold text-slate-900">
-        {c.title}
-      </h3>
+                <h3 className="text-lg font-semibold text-slate-900">
+                  {c.title}
+                </h3>
 
-      <p className="mt-3 text-sm text-slate-600">{c.desc}</p>
+                <p className="mt-3 text-sm text-slate-600">{c.desc}</p>
 
-      <span className="mt-4 inline-flex items-center gap-2 font-medium text-easyliftBlue hover:underline">
-        Ver en catálogo <ArrowRight size={16} />
-      </span>
-    </motion.button>
-  ))}
-</div>
+                <span className="mt-4 inline-flex items-center gap-2 font-medium text-easyliftBlue hover:underline">
+                  Ver en catálogo <ArrowRight size={16} />
+                </span>
+              </motion.button>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -438,18 +473,18 @@ export default function Home() {
       {/* CÓMO TRABAJAMOS */}
       <section id="pasos" className="section bg-white">
         <div className="container">
-          <div  className="mx-auto max-w-3xl text-center">
-          <motion.div {...fadeIn} className="max-w-3xl">
-            <h2 className="stext-3xl md:text-4xl font-bold text-easyliftBlue">
-              Cómo trabajamos
-            </h2>
-            <p className="mt-3 text-slate-600">
-              Buscamos que el proceso sea claro, rápido y sin sorpresas.
-            </p>
-          </motion.div>
-        </div>
+          <div className="mx-auto max-w-3xl text-center">
+            <motion.div {...fadeIn} className="max-w-3xl">
+              <h2 className="text-3xl md:text-4xl font-bold text-easyliftBlue">
+                Cómo trabajamos
+              </h2>
+              <p className="mt-3 text-slate-600">
+                Buscamos que el proceso sea claro, rápido y sin sorpresas.
+              </p>
+            </motion.div>
+          </div>
 
-          <div className="mt-10 grid gap-6 md:gap-8 md:grid-cols-4">
+          <div className="mt-10 grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
             {[
               {
                 step: "1",
@@ -478,14 +513,14 @@ export default function Home() {
                 ],
               },
               {
-  step: "4",
-  title: "Servicio postventa",
-  items: [
-    "Todos nuestros equipos cuentan con garantía.",
-    "Disponemos de repuestos originales.",
-    "Brindamos soporte para asegurar continuidad operativa.",
-  ],
-}
+                step: "4",
+                title: "Servicio postventa",
+                items: [
+                  "Todos nuestros equipos cuentan con garantía.",
+                  "Disponemos de repuestos originales.",
+                  "Brindamos soporte para asegurar continuidad operativa.",
+                ],
+              },
             ].map((step) => (
               <motion.div
                 key={step.step}
@@ -557,43 +592,62 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section id="clientes" className="section bg-gradient-to-b from-slate-50 to-white">
+
+      {/* CLIENTES */}
+      {/* CLIENTES */}
+<section id="clientes" className="section bg-white overflow-hidden py-20">
   <div className="mx-auto max-w-7xl px-4">
     <div className="mx-auto max-w-3xl text-center">
       <span className="inline-flex items-center rounded-full border border-easyliftBlue/20 bg-easyliftBlue/10 px-4 py-1 text-sm font-medium text-easyliftBlue">
         Clientes
       </span>
 
-      <h2 className="mt-4 text-3xl font-bold tracking-tight text-easyliftBlue sm:text-4xl md:text-5xl ">
+      <h2 className="mt-4 text-3xl font-bold tracking-tight text-easyliftBlue sm:text-4xl md:text-5xl">
         Empresas que confían en nosotros
       </h2>
-
     </div>
   </div>
 
-  <div className="relative mt-12 w-full overflow-hidden">
-    <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-8 bg-gradient-to-r from-[#edf2ff] to-transparent md:w-12" />
-    <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-8 bg-gradient-to-l from-[#edf2ff] to-transparent md:w-12" />
+  <div className="relative mt-16 w-full overflow-hidden select-none">
+    {/* Gradientes laterales para suavizar la entrada/salida de logos (Opcional pero recomendado) */}
+    <div className="absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-white to-transparent pointer-events-none" />
+    <div className="absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-white to-transparent pointer-events-none" />
 
     <motion.div
-      className="flex w-max gap-6"
-      animate={{ x: ["0%", "-50%"] }}
-      transition={{
-        duration: 60,
-        repeat: Infinity,
-        ease: "linear",
+      ref={clientTrackRef}
+      className="flex w-max items-center gap-10 px-6 sm:gap-14 md:gap-16 cursor-grab active:cursor-grabbing touch-pan-y"
+      style={{ x: clientX }}
+      drag="x"
+      dragConstraints={{ left: -10000, right: 10000 }}
+      dragElastic={0.05}
+      onPointerDown={() => setIsClientCarouselPaused(true)}
+      onPointerUp={() => setIsClientCarouselPaused(false)}
+      onPointerLeave={() => setIsClientCarouselPaused(false)}
+      onDragStart={() => setIsClientCarouselPaused(true)}
+      onDragEnd={() => {
+        const loopWidth = clientLoopWidthRef.current;
+        if (loopWidth > 0) {
+          const currentX = clientX.get();
+          // Normalización: asegura que el valor de X siempre esté "mapeado" 
+          // al rango del primer set de logos para evitar huecos blancos.
+          const normalizedX = ((currentX % loopWidth) - loopWidth) % loopWidth;
+          clientX.set(normalizedX);
+        }
+        setIsClientCarouselPaused(false);
       }}
     >
-      {[...clientLogos, ...clientLogos].map((logo, index) => (
+      {/* Triplicamos los logos para que siempre haya contenido a los costados al arrastrar */}
+      {[...clientLogos, ...clientLogos, ...clientLogos].map((logo, index) => (
         <div
           key={`${logo}-${index}`}
-          className="flex h-28 w-[200px] shrink-0 items-center justify-center rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_10px_30px_rgba(15,23,42,0.05)] transition duration-300 hover:-translate-y-1 hover:border-easyliftBlue/30 hover:shadow-[0_18px_40px_rgba(15,23,42,0.10)] sm:h-32 sm:w-[220px]"
+          className="flex shrink-0 items-center justify-center"
         >
           <img
             src={logo}
             alt={`Cliente ${index + 1}`}
-            className="h-auto max-h-10 w-auto max-w-[140px] object-contain transition duration-300 sm:max-h-12 sm:max-w-[160px]"
+            className="h-14 sm:h-16 md:h-20 w-auto max-w-none object-contain"
             loading="lazy"
+            draggable={false}
           />
         </div>
       ))}
@@ -663,7 +717,7 @@ export default function Home() {
         href={WHATSAPP}
         target="_blank"
         rel="noreferrer"
-        className="fixed bottom-6 right-6 grid h-12 w-12 place-content-center rounded-full bg-easyliftBlue text-white shadow-lg hover:scale-105 transition-transform"
+        className="fixed bottom-4 right-4 grid h-14 w-14 md:h-12 md:w-12 place-content-center rounded-full bg-easyliftBlue text-white shadow-lg hover:scale-105 transition-transform"
         aria-label="WhatsApp"
       >
         <MessageCircle />
