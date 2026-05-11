@@ -278,56 +278,33 @@ export default function Home() {
       </AnimatePresence>
 
       {/* HERO */}
-      <section
-        id="inicio"
-        className="relative min-h-[85vh] md:h-[80vh] flex flex-col items-center justify-center bg-gradient-to-b from-white to-[#f2f4ff] md:overflow-hidden"
-      >
-        <div className="absolute inset-0 z-0">
-          <div className="slideshow">
-            <div className="slide">
-              <img src="/fondo1.png" alt="Equipos Easylift 1" />
-            </div>
-            <div className="slide">
-              <img src="/fondo2.png" alt="Equipos Easylift 2" />
-            </div>
-            <div className="slide">
-              <img src="/fondo3.png" alt="Equipos Easylift 3" />
-            </div>
-          </div>
-          <div className="absolute inset-0 bg-slate-900/55" />
-        </div>
+      <section id="inicio" className="relative w-full overflow-hidden bg-white">
+  <div className="relative w-full h-[340px] sm:h-[520px] md:h-[640px] lg:h-[calc(100vh-80px)] xl:h-[calc(100vh-80px)] bg-white">
+    {/* Bloques de color fijos en los costados */}
+    <div className="absolute left-0 top-0 h-full w-1/2 bg-[#040d3d] animate-bannerOne transition-colors duration-[2000ms] ease-in-out"></div>
+    <div className="absolute right-0 top-0 h-full w-1/2 bg-[#f1f5f9] animate-bannerOne transition-colors duration-[2000ms] ease-in-out"></div>
+    <div className="absolute left-0 top-0 h-full w-full bg-[#f1f5f9] animate-bannerTwo transition-colors duration-[2000ms] ease-in-out"></div>
 
-        <div className="relative z-10 text-center text-white px-4 w-full pt-24 pb-12">
-          <img
-            src="/easylift-logo.png"
-            alt="Easylift"
-            className="mx-auto mb-6 w-56 sm:w-64 md:w-96 lg:w-[26rem] drop-shadow-2xl animate-fadeIn"
-          />
-          <div className="max-w-3xl mx-auto">
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold drop-shadow-2xl">
-              Equipos de elevación que{" "}
-              <span className="text-easyliftAccent font-bold">optimizarán</span>{" "}
-              tu depósito, tu logística y tu producción.
-            </h1>
-            <p className="mt-3 text-sm md:text-base text-slate-100/85 drop-shadow-lg">
-              Autoelevadores, transpaletas, apiladores y plataformas con
-              asesoramiento especializado, entrega rápida y servicio postventa.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-4 justify-center">
-              <a href="#contacto" className="btn btn-primary py-3 px-6 text-sm sm:text-base">
-                Pedir cotización <ArrowRight size={18} />
-              </a>
-              <button
-                type="button"
-                onClick={() => goCatalogTop("/productos")}
-                className="btn bg-white/90 text-easyliftBlue py-3 px-6 text-sm sm:text-base hover:bg-white transition"
-              >
-                Ver catálogo
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+    {[
+      "/Bannereasylift (1).png",
+      "/Bannereasylift1 (1).png",
+    ].map((image, index) => (
+      <div
+        key={image}
+        className={`absolute inset-0 flex items-center justify-center bg-transparent transition-opacity duration-[2500ms] ease-in-out ${
+          index === 0 ? "animate-bannerOne" : "animate-bannerTwo"
+        }`}
+      >
+        <img
+          src={image}
+          alt={`Banner Easylift ${index + 1}`}
+          className="h-full w-full object-contain object-center bg-transparent"
+          draggable={false}
+        />
+      </div>
+    ))}
+  </div>
+</section>
 
       {/* PRODUCTOS */}
       <section id="productos" className="section bg-white">

@@ -89,5 +89,42 @@ body,
 }
 
 .animate-fadeIn {
-  animation: fadeIn 1.2s ease-out forwards;
+  animation: fadeIn 2s ease-out forwards;
+    
+}
+
+@keyframes bannerOne {
+  0%, 42% {
+    opacity: 1;
+  }
+
+  50%, 92% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes bannerTwo {
+  0%, 42% {
+    opacity: 0;
+  }
+
+  50%, 92% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-bannerOne {
+  animation: bannerOne 14s infinite ease-in-out;
+}
+
+.animate-bannerTwo {
+  animation: bannerTwo 14s infinite ease-in-out;
 }
